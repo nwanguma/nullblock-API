@@ -1,6 +1,6 @@
 const { AppError } = require("../utils");
 
-const inputValidation = (validationSchema) => {
+const payloadValidation = (validationSchema) => {
   return (req, res, next) => {
     const { error } = validationSchema.validate(req.body);
 
@@ -16,4 +16,4 @@ const inputValidation = (validationSchema) => {
   };
 };
 
-module.exports = inputValidation;
+module.exports = payloadValidation;

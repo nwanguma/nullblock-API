@@ -1,9 +1,9 @@
 const error = require("./error");
 const authenticate = require("./auth");
-const inputValidation = require("./inputValidation");
+const payloadValidation = require("./payloadValidation");
 
 module.exports = {
   error,
   authenticate,
-  inputValidation,
+  payloadValidation,
 };

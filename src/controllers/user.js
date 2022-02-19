@@ -1,5 +1,7 @@
+const bcrypt = require("bcrypt");
+
 const User = require("../models/user");
-const { wrapAsync } = require("../utils");
+const { wrapAsync, AppError } = require("../utils");
 
 const registerUser = wrapAsync(async (req, res, next) => {
   const {
@@ -10,10 +12,10 @@ const registerUser = wrapAsync(async (req, res, next) => {
     phone,
     country,
     password,
-    password_confirmation,
+    passwordConfirmation,
   } = req.body;
 
-  if (password !== password_confirmation)
+  if (password !== passwordConfirmation)
     throw new Error("Passwords do not match", 400);
 
   const newUser = new User({
@@ -24,7 +26,7 @@ const registerUser = wrapAsync(async (req, res, next) => {
     phone,
     country,
     password,
-    password_confirmation,
+    passwordConfirmation,
   });
 
   await newUser.save();
@@ -108,6 +110,27 @@ const getUserById = wrapAsync(async (req, res, next) => {
   });
 });
 
+const changeUserPassword = wrapAsync(async (req, res, next) => {
+  const { password, newPassword, passwordConfirmation } = req.body;
+  const user = req.user;
+
+  if (newPassword !== passwordConfirmation)
+    throw new AppError("Passwords do not match", 400);
+
+  bcrypt.compare(password, user.password, (err, res) => {
+    if (!res) throw new AppError("Password incorrect", 400);
+  });
+
+  user.password = newPassword;
+
+  await user.save();
+
+  res.status(201).send({
+    success: true,
+    message: "Password changed successully!",
+  });
+});
+
 module.exports = {
   registerUser,
   getAllUsers,
@@ -116,4 +139,5 @@ module.exports = {
   logoutAllDevices,
   getCurrentUser,
   getUserById,
+  changeUserPassword,
 };
